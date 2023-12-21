@@ -1,13 +1,53 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Fast Notes</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  
+    <!-- Add your custom styles here -->
+    <style>
+      body {
+        background-color: #f8f9fa;
+        color: #495057;
+        font-family: 'Arial', sans-serif;
+      }
+  
+    
+  
+      h1,
+      h2,
+      h4 {
+        color: #007bff;
+      }
+  
+      .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+      }
+  
+      .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+      }
+  
+      .card {
+        background-color: #ffffff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+  
+      .modal-content {
+        background-color: #ffffff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+    </style>
   </head>
-  <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary",>
         <div class="container-fluid">
           <a class="navbar-brand" href="#">FastNote</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,31 +65,71 @@
 
       <div class="container">
         <h1>Start storing your notes</h1>
-        <form method="post">
+        <form action="/" method="post">
             <div class="mb-3">
               <label for="title" class="form-label">Note Title</label>
-              <input type="text" class="form-control" id="title" aria-describedby="emailHelp">
+              <input type="text" class="form-control" name="title" aria-describedby="emailHelp">
             </div>
             <div class="mb-3">
-              <label for="descnote" class="form-label">Describe Your Note</label>
-              <input type="text" class="form-control" id="descnote">
+              <label for="desc" class="form-label">Describe Your Note</label>
+              <input type="text" class="form-control" name="desc">
             </div>
            
             <button type="submit" class="btn btn-primary">Submit</button>
           </form>
 
-      </div>
-      <br>
-      <div class="container">
-        <h3>Your Notes</h3>
-           {% for item in newdoc %}
-           
-      <div>
-        {{item.note}}
-      </div>
-           
-          {% endfor %}
-      </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-  </body>
+          <div class="container mt-5">
+            <h2>Your Notes</h2>
+            {% if newdoc  %}
+               {% for item in newdoc %}
+                  <div class="card mt-3 position-relative">
+                     <div class="card-body">
+                        <h4 class="card-title">{{item.title}}</h4>
+                        <p class="card-text">{{item.desc}}</p>
+                        <div class="position-absolute top-0 end-0 p-2">
+                           <form action="/delete" method="post" class="d-inline">
+                              <input type="hidden" name="note_id" value="{{item.id}}">
+                              <button type="submit" class="btn btn-danger">Delete</button>
+                           </form>
+                           <button type="button" class="btn btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#editModal{{ item.id }}">
+                              Edit
+                           </button>
+                        </div>
+                     </div>
+                  </div>
+         
+                  <!-- Edit Modal -->
+                  <div class="modal fade" id="editModal{{ item.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ item.id }}" aria-hidden="true">
+                     <div class="modal-dialog">
+                        <div class="modal-content">
+                           <div class="modal-header">
+                              <h5 class="modal-title" id="editModalLabel{{ item.id }}">Edit Note</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                           </div>
+                           <div class="modal-body">
+                              <form action="/edit/{{ item.id }}" method="post">
+                                 <div class="mb-3">
+                                    <label for="title" class="form-label">Note Title</label>
+                                    <input type="text" class="form-control" id="title" name="title" value="{{ item.title }}" required>
+                                 </div>
+                                 <div class="mb-3">
+                                    <label for="desc" class="form-label">Note Description</label>
+                                    <textarea class="form-control" id="desc" name="desc" rows="3" required>{{ item.desc }}</textarea>
+                                 </div>
+                                 <button type="submit" class="btn btn-primary">Save Changes</button>
+                              </form>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               {% endfor %}
+            {% else %}
+               <p>No notes to display</p>
+            {% endif %}
+         </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+
 </html>
